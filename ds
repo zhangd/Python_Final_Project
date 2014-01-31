@@ -1,0 +1,191 @@
+[1mdiff --git a/unicorn.png b/unicorn.png[m
+[1mindex 97bcb28..b549912 100644[m
+Binary files a/unicorn.png and b/unicorn.png differ
+[1mdiff --git a/winterbells.py b/winterbells.py[m
+[1mindex 1317083..2edcd1b 100644[m
+[1m--- a/winterbells.py[m
+[1m+++ b/winterbells.py[m
+[36m@@ -1,6 +1,8 @@[m
+[31m-# THIS IS A MOTHERF***ING COMMENT[m
+[31m-[m
+ import pygame[m
+[32m+[m[32mfrom random import randint[m
+[32m+[m[32mfrom pygame.locals import *[m
+[32m+[m
+[32m+[m[32mif not pygame.font: print 'Warning, fonts disabled'[m
+ WIDTH = 50[m
+ HEIGHT= 50[m
+ def new_game(size = 500):[m
+[36m@@ -15,36 +17,105 @@[m [mdef new_game(size = 500):[m
+ [m
+     clock = pygame.time.Clock()[m
+     [m
+[32m+[m[41m    [m
+     background = pygame.Surface(screen.get_size())[m
+     background = background.convert()[m
+     background.fill((250, 250, 250))[m
+ [m
+     main_loop(screen, board, clock, background, False)[m
+[32m+[m
+[32m+[m[32mdef update_text(screen, background, message, size = 10):[m
+[32m+[m[32m    textSize = 20[m
+[32m+[m[32m    font = pygame.font.Font(None, 20)[m
+[32m+[m[32m    textY = 0 + textSize[m
+[32m+[m[32m    text = font.render(message, True, (250,250,250), (0,0,0))[m
+[32m+[m[32m    textRect = text.get_rect()[m
+[32m+[m[32m    screen.blit(text, text.get_rect(centerx=background.get_width()/2))[m
+     [m
+ def main_loop(screen, board, clock, background, stop):[m
+[32m+[m[32m    score=0[m
+     g=.1[m
+     v=0[m
+[32m+[m[32m    rainbowTimer = 0[m
+[32m+[m[32m    groundPos = screen.get_size()[0]-100[m
+[32m+[m[32m    onGround = True[m
+[32m+[m[32m    board.unicorn.set_y_pos(groundPos-HEIGHT-50)[m
+[32m+[m[32m    x_pos_prev=0[m
+[32m+[m
+[32m+[m[32m    pygame.font.init()[m
+[32m+[m[32m    font = pygame.font.Font(None, 36)[m
+[32m+[m
+[32m+[m[41m    [m
+[32m+[m
+[32m+[m[41m    [m
+     while stop == False:[m
+[32m+[m[32m        print(board.unicorn.y_pos)[m
+[32m+[m
+[32m+[m[41m        [m
+         screen.blit(background, (0, 0))[m
+[31m-        pygame.event.pump()[m
+[32m+[m[32m        if pygame.font:[m
+[32m+[m[32m            update_text(screen, background, "Score:" + str(score), size = 10)[m
+[32m+[m
+[32m+[m[32m        if rainbowTimer % 100 ==0:[m
+[32m+[m[32m            r=Rainbow(4)[m
+[32m+[m[32m            board.addRainbow(r)[m
+[32m+[m[32m        board.unicorn.move_y_pos(1)[m
+[32m+[m[32m        if not onGround:[m
+[32m+[m[32m            groundPos+=1[m
+[32m+[m[32m        for r in board.rainbows:[m
+[32m+[m[32m            if r.disappear_rainbow(board.unicorn.rect):[m
+[32m+[m[32m                onGround=False[m
+[32m+[m[32m                if v<10:v-=4[m
+[32m+[m[32m                else: v-=1[m
+[32m+[m[32m                board.rainbows.remove(r)[m
+[32m+[m[32m                r.kill()[m
+[32m+[m[32m                score+=1[m
+[32m+[m[32m                #for rain in board.rainbows:[m
+[32m+[m[32m                r.move_rainbow(v)[m
+[32m+[m[32m            r.move_rainbow(1)[m
+         board.rainbows.draw(screen)[m
+[31m-        board.theUnicorn.draw(screen)[m
+[31m-        pygame.display.flip()[m
+[32m+[m[41m        [m
+[32m+[m
+         events = pygame.event.get()[m
+[32m+[m[41m        [m
+         for event in events:[m
+             if event.type == pygame.MOUSEBUTTONDOWN:[m
+[31m-                v-=3[m
+[31m-                #print(pygame.mouse.get_pos())[m
+[32m+[m[32m                v-=5[m
+[32m+[m[32m        pygame.event.pump()[m
+         board.unicorn.move_y_pos(v)[m
+[31m-         [m
+[31m-        #print(pygame.mouse.get_pos()[0])[m
+[32m+[m
+[32m+[m
+[32m+[m[32m        board.rainbows.draw(screen)[m
+[32m+[m[32m        #board.unicorn.set_y_pos(1)[m[41m [m
+[32m+[m[32m        # board.rainbows.draw(screen)[m
+[32m+[m[32m        board.theUnicorn.draw(screen)[m
+[32m+[m[32m        pygame.draw.line(screen, (0,0,0), (0,groundPos), (screen.get_size()[0],groundPos),1)[m
+[32m+[m[32m        if abs(v)>.1:[m
+[32m+[m[32m            groundPos-=v[m[41m        [m
+         board.unicorn.move_x_pos(pygame.mouse.get_pos()[0])[m
+[32m+[m[32m        x_pos = pygame.mouse.get_pos()[0][m
+[32m+[m[32m        if(x_pos<x_pos_prev):[m
+[32m+[m[32m           board.unicorn.set_right()[m
+[32m+[m[32m        elif(x_pos>x_pos_prev):[m
+[32m+[m[32m            board.unicorn.set_left()[m
+[32m+[m[32m        pygame.display.flip()[m
+[32m+[m[32m        clock.tick(150)[m
+[32m+[m[32m        if (board.unicorn.get_y_pos()+100>groundPos):[m
+[32m+[m[32m            v=0[m
+[32m+[m[32m            board.unicorn.set_y_pos(groundPos-HEIGHT-50)[m
+[32m+[m[32m        elif v!=0:[m
+[32m+[m[32m            v+=g[m
+[32m+[m[32m        x_pos_prev=x_pos[m
+[32m+[m[32m        rainbowTimer+=1[m
+         pygame.display.flip()[m
+[31m-        clock.tick(100)[m
+[31m-        v+=g[m
+[31m-        print(v, board.unicorn.y_pos)[m
+[31m-        print("suq madiq")[m
+[31m-                                                [m
+[32m+[m[32m        #print(v)[m
+[32m+[m[32m        if board.unicorn.y_pos>500:[m
+[32m+[m[32m            print("ASDFLJ;ABSDF;LJABDVLJABDFLJVBADLFKJVBADKJLFBVALJDFBVLKAJDBFV")[m
+[32m+[m[32m            stop=True[m
+[32m+[m[32m    update_text(screen, background, "GAME OVER", size = 10)[m
+[32m+[m[32m    pygame.display.flip()[m
+[32m+[m[32m    pygame.time.wait(1000)[m
+[32m+[m[41m [m
+ class Board:[m
+     def __init__(self):[m
+         self.rainbowDict = {}[m
+[36m@@ -52,8 +123,9 @@[m [mclass Board:[m
+         self.rainbows = pygame.sprite.RenderPlain()[m
+         self.theUnicorn = pygame.sprite.RenderPlain()[m
+         self.theUnicorn.add(self.unicorn)[m
+[32m+[m[32m        self.rainbow = Rainbow(4)[m
+     def addRainbow(self, rainbow):[m
+[31m-        self.rainbowDict[rainbow.getCurrentLocation()]=rainbow[m
+[32m+[m[32m        self.rainbowDict[rainbow.get_current_location()]=rainbow[m
+         self.rainbows.add(rainbow)[m
+         [m
+ class Unicorn(pygame.sprite.Sprite):[m
+[36m@@ -64,11 +136,18 @@[m [mclass Unicorn(pygame.sprite.Sprite):[m
+         self.rect = pygame.Surface([WIDTH, HEIGHT]).get_rect()[m
+         self.rect.x=self.x_pos[m
+         self.rect.y=self.y_pos[m
+[31m-        self.set_pic()[m
+[32m+[m[32m        self.set_pic()[m[41m  [m
+[32m+[m[32m        self.left = self.image[m
+[32m+[m[32m        self.right = pygame.transform.flip(self.image, True, False)[m
+     def get_y_pos(self):[m
+         return self.y_pos[m
+[32m+[m[32m    def flip(self):[m
+[32m+[m[32m        self.image = pygame.transform.flip(self.image, True, False)[m
+     def jump(self):[m
+         pass[m
+[32m+[m[32m    def set_y_pos(self, y):#necessary for making sure the unicorn is initiated at ground level[m
+[32m+[m[32m        self.y_pos=y[m
+[32m+[m[32m        self.rect.y=y[m
+     def move_y_pos(self, mouse_y):[m
+         self.y_pos=self.y_pos+mouse_y[m
+         self.rect.y=self.y_pos+mouse_y[m
+[36m@@ -77,7 +156,41 @@[m [mclass Unicorn(pygame.sprite.Sprite):[m
+         self.rect.x=mouse_x[m
+     def set_pic(self):[m
+         self.image = pygame.image.load("unicorn.png").convert_alpha()[m
+[31m-        #self.image=self.image.get_size(100,100)[m
+[31m-      [m
+[32m+[m[32m    def set_right(self):[m
+[32m+[m[32m        self.image = self.right[m
+[32m+[m[32m    def set_left(self):[m
+[32m+[m[32m        self.image = self.left[m
+[32m+[m[41m        [m
+[32m+[m[32mclass Rainbow(pygame.sprite.Sprite):[m
+[32m+[m[32m    def __init__(self, col):[m
+[32m+[m[32m        pygame.sprite.Sprite.__init__(self)[m
+[32m+[m[32m        window_size = 500[m
+[32m+[m[32m        self.a=randint(0,window_size)[m
+[32m+[m[32m        self.b=randint(-500,0)[m
+[32m+[m[32m        self.col = col[m
+[32m+[m[32m        self.rainbow_pic()[m
+[32m+[m[32m        screen = pygame.display.get_surface()[m
+[32m+[m[32m        self.rect = self.image.get_rect()[m
+[32m+[m[32m        self.rect.x = self.a[m
+[32m+[m[32m        self.rect.y = self.b[m
+[32m+[
